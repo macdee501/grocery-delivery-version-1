@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Link, router } from 'expo-router';
 import CustomInputField from '@/components/CustomInputField';
 import CustomButton from '@/components/CustomButton';
+import { signIn } from '@/lib/appwrite';
 
 export default function SignInScreen() {
 
@@ -19,11 +20,12 @@ export default function SignInScreen() {
         setIsSubmitting(true)
 
         try{
+            await signIn({email,password})
             router.replace('/')
         }
         catch(error)
         {
-            Alert.alert('Error',"error.message")
+            Alert.alert('Error',`Could not Sign In ${error}`)
         }
         finally{
             setIsSubmitting(false)

@@ -90,18 +90,18 @@ interface ProfileFieldProps {
     icon: ImageSourcePropType;
 }
 
-interface CreateUserPrams {
+export interface CreateUserParams {
     email: string;
     password: string;
     name: string;
 }
 
-interface SignInParams {
+export interface SignInParams {
     email: string;
     password: string;
 }
 
-interface GetMenuParams {
-    category: string;
-    query: string;
+export interface GetMenuParams {
+    category?: string;
+    query?: string;
 }
