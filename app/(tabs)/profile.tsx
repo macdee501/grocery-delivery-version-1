@@ -9,4 +9,3 @@ export default function profile() {
   )
 }
 
-const styles = StyleSheet.create({})

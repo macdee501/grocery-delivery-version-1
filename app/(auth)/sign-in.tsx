@@ -4,11 +4,13 @@ import { Link, router } from 'expo-router';
 import CustomInputField from '@/components/CustomInputField';
 import CustomButton from '@/components/CustomButton';
 import { signIn } from '@/lib/appwrite';
+import useAuthStore from '@/store/auth.store';
 
 export default function SignInScreen() {
 
     const [isSubmitting,setIsSubmitting] = useState(false);
     const [form,setForm] = useState({email:"",password:""})
+    const { fetchAuthenticatedUser } = useAuthStore(); 
 
     async function submitForm()
     {
@@ -21,7 +23,8 @@ export default function SignInScreen() {
 
         try{
             await signIn({email,password})
-            router.replace('/')
+            await fetchAuthenticatedUser();
+            router.replace('/(tabs)')
         }
         catch(error)
         {

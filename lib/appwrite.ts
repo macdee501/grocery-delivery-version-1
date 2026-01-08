@@ -27,19 +27,28 @@ const avatars = new Avatars(client);
 export const createUser = async ({ email, password, name }: CreateUserParams) => {
     try {
 
-        const newAccount = await account.create(ID.unique(), email, password, name)
+        const newAccount = 
+        await account.create(ID.unique(), email, password, name)
+        console.log('✅ Account created:', newAccount.$id);
+        
         if(!newAccount) throw Error;
 
-        await signIn({ email, password });
+        // const session =await signIn({ email, password });
+        // console.log('Session after signIn:', session);
 
         const avatarUrl = avatars.getInitialsURL(name);
+        console.log('✅ Avatar URL:', avatarUrl);
 
-        return await databases.createDocument(
+       
+        const userDoc = await databases.createDocument(
             appwriteConfig.databaseId,
             appwriteConfig.userWithMoreAttributesId,
             ID.unique(),
             { email, name, accountId: newAccount.$id, avatar: avatarUrl }
         );
+        
+        console.log('✅ User document created:', userDoc.$id, 'for accountId:', newAccount.$id);
+        return userDoc;
     } catch (e) {
         throw new Error(e as string);
     }
@@ -48,6 +57,8 @@ export const createUser = async ({ email, password, name }: CreateUserParams) =>
 export const signIn = async ({ email, password }: SignInParams) => {
     try {
         const session = await account.createEmailPasswordSession(email, password);
+        console.log('✅ Session created successfully:', session.$id)
+        return session;
     } catch (e) {
         throw new Error(e as string);
     }
@@ -56,6 +67,9 @@ export const signIn = async ({ email, password }: SignInParams) => {
 export const getCurrentUser = async () => {
     try {
         const currentAccount = await account.get();
+       
+        console.log('✅ Current account ID:', currentAccount.$id);
+       
         if(!currentAccount) throw Error;
 
         const currentUser = await databases.listDocuments(

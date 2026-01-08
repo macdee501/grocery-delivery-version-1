@@ -4,11 +4,12 @@ import CustomButton from "@/components/CustomButton";
 import {useState} from "react";
 import CustomInputField from '@/components/CustomInputField';
 import { createUser } from '@/lib/appwrite';
+import useAuthStore from '@/store/auth.store';
 
 const SignUp = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [form, setForm] = useState({ name: '', email: '', password: '' });
-
+    const { fetchAuthenticatedUser } = useAuthStore();
     const submit = async () => {
         const { name, email, password } = form;
 
@@ -19,8 +20,8 @@ const SignUp = () => {
         try {
 
             await createUser({email,password,name})
-
-            router.replace('/');
+            await fetchAuthenticatedUser();
+            router.replace('/sign-in');
         } catch(error: any) {
             Alert.alert('Error', error.message);
         } finally {
