@@ -1,11 +1,83 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Alert, FlatList, Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from "react-native-safe-area-context";
+import useAppwrite from "@/lib/useAppwrite";
+import { getCategories, getProducts } from "@/lib/appwrite";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
+import CartButton from "@/components/CartButton";
+import cn from "clsx";
+// import ProductCard from "@/components/ProductCard"; // Create this next
+import { Product } from "@/type";
+// import Filter from "@/components/Filter"; // Create this next
+// import SearchBar from "@/components/SearchBar"; // Create this next
 
-export default function search() {
-  return (
-    <View>
-      <Text>search</Text>
-    </View>
-  )
+const Search = () => {
+    const { category, query } = useLocalSearchParams<{query: string; category: string}>();
+    
+    const { data, refetch, loading } = useAppwrite({ 
+        fn: getProducts, 
+        params: { category, query, limit: 6 } 
+    });
+    
+    const { data: categories } = useAppwrite({ fn: getCategories });
+    
+    useEffect(() => {
+        refetch({ category, query, limit: 6 });
+    }, [category, query]);
+    
+    return (
+        <SafeAreaView className="bg-white h-full">
+            <FlatList
+                data={data || []}
+                renderItem={({ item, index }) => {
+                    const isFirstRightColItem = index % 2 === 0;
+                    
+                    return (
+                     
+
+                        <View className={cn("flex-1 max-w-[48%]", !isFirstRightColItem ? 'mt-10' : 'mt-0')}>
+                            {/* Temporary placeholder - replace with ProductCard later */}
+                            <View className="bg-gray-100 p-4 rounded-lg h-40">
+                                <Text className="font-bold">{item.name}</Text>
+                                <Text className="text-primary">R{item.price}</Text>
+                            </View>
+                        </View>
+                    
+                    )
+                }}
+                keyExtractor={item => item.$id}
+                numColumns={2}
+                columnWrapperClassName="gap-7"
+                contentContainerClassName="gap-7 px-5 pb-32"
+                ListHeaderComponent={() => (
+                    <View className="my-5 gap-5">
+                        <View className="flex-between flex-row w-full">
+                            <View className="flex-start">
+                                <Text className="small-bold uppercase text-primary">Search</Text>
+                                <View className="flex-start flex-row gap-x-1 mt-0.5">
+                                    <Text className="paragraph-semibold text-dark-100">
+                                        Find your groceries
+                                    </Text>
+                                </View>
+                            </View>
+                            <CartButton />
+                        </View>
+                        {/* Add SearchBar component here when ready */}
+                        {/* <SearchBar /> */}
+                        {/* Add Filter component here when ready */}
+                        {/* <Filter categories={categories!} /> */}
+                    </View>
+                )}
+                ListEmptyComponent={() => 
+                    !loading && (
+                        <Text className="text-center p-5 text-gray-500">
+                            No products found
+                        </Text>
+                    )
+                }
+            />
+        </SafeAreaView>
+    )
 }
 
+export default Search;

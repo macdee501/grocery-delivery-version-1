@@ -13,11 +13,15 @@ export default function Index() {
     // Safe area allows everything to be displayed correctly on the screen
     <SafeAreaView
     className="flex-1 bg-white"
+    pointerEvents="box-none"
     >
-       {console.log('🏗️ Inside SafeAreaView')}
       <FlatList
+
+      scrollEnabled={true}
+      pointerEvents="auto"
+
       data={offers}
-      renderItem={({item,index}) =>{
+      keyExtractor={(item, index) => item.id?.toString() || index.toString()}      renderItem={({item,index}) =>{
         
         console.log('🔲 Rendering offer item:', index);
         const iseEven = index % 2 === 0;

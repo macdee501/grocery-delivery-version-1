@@ -104,4 +104,14 @@ export interface SignInParams {
 export interface GetProductParams {
     category?: string;
     query?: string;
+    limit?:number;
+}
+
+export interface Product{
+    $id: string;
+    name: string;
+    price: number;
+    image?: string;
+    category: string;
+    description?: string;
 }
