@@ -6,15 +6,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import cn from 'clsx'
 
 export default function Index() {
+  console.log('🏠 HOME SCREEN RENDER:', Math.random());
+  console.log('📦 Offers data:', offers?.length);
   return (
 
     // Safe area allows everything to be displayed correctly on the screen
     <SafeAreaView
     className="flex-1 bg-white"
     >
+       {console.log('🏗️ Inside SafeAreaView')}
       <FlatList
       data={offers}
       renderItem={({item,index}) =>{
+        
+        console.log('🔲 Rendering offer item:', index);
         const iseEven = index % 2 === 0;
 
         return (
@@ -52,10 +57,14 @@ export default function Index() {
         </View>
         )
    
+      
       }}
 
       contentContainerClassName="pb-28 px-5"
-      ListHeaderComponent={()=>(
+      ListHeaderComponent={()=>{
+        console.log('📋 Rendering ListHeader');
+        return (
+
         <View
         className="flex-between flex-row w-full my-5">
           <View className="flex-start">
@@ -72,7 +81,9 @@ export default function Index() {
 
           <CartButton/>
         </View>
-      )}
+      )
+    
+    }}
       />
 
     

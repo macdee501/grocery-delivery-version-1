@@ -1,4 +1,4 @@
-import { CreateUserParams, SignInParams } from "@/type";
+import { CreateUserParams, GetProductParams, SignInParams } from "@/type";
 import { Account, Avatars, Client, Databases, ID, Query, Storage } from "react-native-appwrite";
 
 export const appwriteConfig = {
@@ -8,10 +8,9 @@ export const appwriteConfig = {
     databaseId: '695a370a00012c4487d0',
     bucketId: '68643e170015edaa95d7',
     userWithMoreAttributesId: '695fcfbc00060332df29',
-    categoriesCollectionId: '68643a390017b239fa0f',
-    menuCollectionId: '68643ad80027ddb96920',
-    customizationsCollectionId: '68643c0300297e5abc95',
-    menuCustomizationsCollectionId: '68643cd8003580ecdd8f'
+    categoriesTableId: '6960c007003e37257a63',
+    shopProductsTableId: '6960c0f1002811bfd6ac',
+    
 }
 
 export const client = new Client();
@@ -54,6 +53,7 @@ export const createUser = async ({ email, password, name }: CreateUserParams) =>
     }
 }
 
+// function to sign in and create a session
 export const signIn = async ({ email, password }: SignInParams) => {
     try {
         const session = await account.createEmailPasswordSession(email, password);
@@ -64,6 +64,7 @@ export const signIn = async ({ email, password }: SignInParams) => {
     }
 }
 
+// function to test currently signed in user
 export const getCurrentUser = async () => {
     try {
         const currentAccount = await account.get();
@@ -86,3 +87,38 @@ export const getCurrentUser = async () => {
         throw new Error(e as string);
     }
 }
+
+// export const getProducts = async({category,query}:GetProductParams)=>{
+//     try{
+//         const queries: string[]=[];
+
+//         if(category) queries.push(Query.equal('categories',category));
+//         if(query) queries.push(Query.search('name',query));
+
+//         const products = await databases.listDocuments(
+//             appwriteConfig.databaseId,
+//             appwriteConfig.shopProductsTableId,
+//             queries,
+//         )
+
+//         return products.documents;
+//     }
+//     catch(error)
+//     {
+//         throw new Error(error as string);
+//     }
+
+// }
+
+// export const getCategories = async () => {
+//     try {
+//         const categories = await databases.listDocuments(
+//             appwriteConfig.databaseId,
+//             appwriteConfig.categoriesTableId,
+//         )
+
+//         return categories.documents;
+//     } catch (e) {
+//         throw new Error(e as string);
+//     }
+// }

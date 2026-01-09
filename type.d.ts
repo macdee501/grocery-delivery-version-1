@@ -101,7 +101,7 @@ export interface SignInParams {
     password: string;
 }
 
-export interface GetMenuParams {
+export interface GetProductParams {
     category?: string;
     query?: string;
 }

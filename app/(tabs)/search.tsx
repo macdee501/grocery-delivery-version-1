@@ -9,4 +9,3 @@ export default function search() {
   )
 }
 
-const styles = StyleSheet.create({})
