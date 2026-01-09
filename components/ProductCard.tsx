@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity, Image, Platform } from 'react-native'
 import { Product } from "@/type";
 import { appwriteConfig } from "@/lib/appwrite";
-// import { useCartStore } from "@/store/cart.store"; // Create this next
+import { useCartStore } from "@/store/cart.store"; // ✅ Add this import
 
 interface ProductCardProps {
     item: Product;
@@ -10,29 +10,25 @@ interface ProductCardProps {
 const ProductCard = ({ item }: ProductCardProps) => {
     const { $id, image, name, price } = item;
     
-    // If using Appwrite storage
     const imageUrl = image 
         ? `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${image}/view?project=${appwriteConfig.projectId}`
-        : 'https://via.placeholder.com/150'; // Fallback image
+        : 'https://via.placeholder.com/150';
     
-    // Uncomment when you create cart store
-    // const { addItem } = useCartStore();
+    const { addItem } = useCartStore(); // ✅ Add this
     
     const handleAddToCart = () => {
-        console.log('Add to cart:', name);
-        // Uncomment when cart store is ready
-        // addItem({ 
-        //     id: $id, 
-        //     name, 
-        //     price, 
-        //     image_url: imageUrl, 
-        //     quantity: 1 
-        // });
+        addItem({ // ✅ Actually add to cart
+            id: $id, 
+            name, 
+            price, 
+            image_url: imageUrl,
+        });
+        console.log('✅ Added to cart:', name);
     };
     
     return (
         <TouchableOpacity 
-            className="menu-card" // Reuse same class or rename to product-card
+            className="menu-card"
             style={Platform.OS === 'android' ? { elevation: 10, shadowColor: '#878787' } : {}}
         >
             <Image 
