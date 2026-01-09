@@ -6,8 +6,8 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import CartButton from "@/components/CartButton";
 import cn from "clsx";
-// import ProductCard from "@/components/ProductCard"; // Create this next
 import { Product } from "@/type";
+import ProductCard from '@/components/ProductCard';
 // import Filter from "@/components/Filter"; // Create this next
 // import SearchBar from "@/components/SearchBar"; // Create this next
 
@@ -36,11 +36,9 @@ const Search = () => {
                      
 
                         <View className={cn("flex-1 max-w-[48%]", !isFirstRightColItem ? 'mt-10' : 'mt-0')}>
-                            {/* Temporary placeholder - replace with ProductCard later */}
-                            <View className="bg-gray-100 p-4 rounded-lg h-40">
-                                <Text className="font-bold">{item.name}</Text>
-                                <Text className="text-primary">R{item.price}</Text>
-                            </View>
+                           
+                           <ProductCard item={item as Product}/>
+                            
                         </View>
                     
                     )
