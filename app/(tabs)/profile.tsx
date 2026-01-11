@@ -10,7 +10,7 @@ interface MenuItem {
 }
 
 export default function Profile() {
-    const { user, signOut, isLoading } = useAuthStore();
+    const { user, signOutUser, isLoading } = useAuthStore();
     
     const handleSignOut = async () => {
         Alert.alert(
@@ -23,7 +23,7 @@ export default function Profile() {
                     style: 'destructive',
                     onPress: async () => {
                         console.log('🚪 Signing out...');
-                        await signOut();
+                        await signOutUser();
                     }
                 }
             ]
