@@ -88,6 +88,18 @@ export const getCurrentUser = async () => {
     }
 }
 
+// function to sign out user
+export const signOut = async () => {
+    try {
+        await account.deleteSession('current');
+        console.log(' User signed out successfully');
+    } catch (e) {
+        console.error(' Sign out error:', e);
+        throw new Error(e as string);
+    }
+};
+
+
 export const getProducts = async ({ category, query, limit }: GetProductParams) => {
     try {
         const queries: string[] = [];
