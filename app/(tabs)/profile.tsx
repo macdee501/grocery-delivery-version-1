@@ -1,6 +1,8 @@
 import { View, Text, Image, TouchableOpacity, Alert, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useAuthStore from '@/store/auth.store'
+import { Functions } from 'react-native-appwrite';
+import { client } from '@/lib/appwrite';
 
 interface MenuItem {
     id: string;
@@ -11,6 +13,32 @@ interface MenuItem {
 
 export default function Profile() {
     const { user, signOutUser, isLoading } = useAuthStore();
+
+
+    const testHelloWorld = async ()=>{
+      try{
+        console.log('testing hello-world function');
+
+        const functions = new Functions(client)
+
+        const response = await functions.createExecution(
+          '695a57b800041d4f2a66',
+          JSON.stringify({name:user?.name||"Guest"})
+        );
+
+        console.log('Raw response:', response);
+
+        const result = JSON.parse(response.responseBody);
+        console.log('Parsed result',result);
+
+        Alert.alert('Success',result.message);
+      }
+      catch(error)
+      {
+        console.error('❌ Function error:', error);
+            Alert.alert('Error', error.message || 'Function call failed');
+      }
+    }
     
     const handleSignOut = async () => {
         Alert.alert(
@@ -128,6 +156,17 @@ export default function Profile() {
                         <Text className="paragraph-bold text-dark-100 mb-3">
                             Account Settings
                         </Text>
+
+                        <TouchableOpacity
+                        className='bg-blue-500 p-4 rounded-xl mb-4'
+                        onPress={testHelloWorld}
+                        >
+                          <Text
+                          className='text-white text-center font-bold'
+                          >
+                            Test Hello WOrld funtion 
+                          </Text>
+                        </TouchableOpacity>
                     </View>
                 )}
                 ListFooterComponent={() => (
