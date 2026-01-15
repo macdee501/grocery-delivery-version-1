@@ -4,6 +4,8 @@ import{useFonts} from "expo-font";
 import { useEffect } from "react";
 import useAuthStore from "@/store/auth.store";
 
+import {StripeProvider} from '@stripe/stripe-react-native'
+
 
 export default function RootLayout() {
   console.log('🌍 ROOT LAYOUT RENDER:', Math.random());
@@ -44,5 +46,12 @@ export default function RootLayout() {
   }
 
   console.log('🚀 Rendering Stack');
-  return <Stack screenOptions={{headerShown: false}}/>;
+  return(
+    <StripeProvider
+    publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
+    >
+
+      <Stack screenOptions={{headerShown: false}}/>;
+    </StripeProvider>
+  )
 }

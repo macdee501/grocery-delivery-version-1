@@ -3,9 +3,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useCartStore } from "@/store/cart.store";
 import useAuthStore from '@/store/auth.store';
 import cn from "clsx";
-import CustomButton from "@/components/CustomButton";
 import CartItem from "@/components/CartItem";
-import { processPayment, createOrder } from '@/lib/payment';
+import { createPaymentIntent, createOrder } from '@/lib/payment'; // ✅ Updated import
+import { useStripe } from '@stripe/stripe-react-native'; // ✅ Added Stripe
 import { useState } from 'react';
 import { router } from 'expo-router';
 
@@ -31,6 +31,7 @@ export default function Cart() {
     const { items, getTotalItems, getTotalPrice, clearCart } = useCartStore();
     const { user } = useAuthStore();
     const [isProcessing, setIsProcessing] = useState(false);
+    const { initPaymentSheet, presentPaymentSheet } = useStripe(); // ✅ Added Stripe hook
     
     const totalItems = getTotalItems();
     const totalPrice = getTotalPrice();
@@ -57,23 +58,61 @@ export default function Cart() {
             setIsProcessing(true);
             console.log('🛒 Starting checkout process...');
             
-            // Step 1: Process Payment
-            console.log('💳 Step 1: Processing payment...');
-            const paymentResult = await processPayment(
+            // Step 1: Create Payment Intent
+            console.log('💳 Step 1: Creating payment intent...');
+            const paymentIntent = await createPaymentIntent(
                 finalTotal,
                 `Grocery order - ${totalItems} items`
             );
             
-            if (!paymentResult.success) {
-                throw new Error(paymentResult.message || 'Payment failed');
+            if (!paymentIntent.success) {
+                throw new Error(paymentIntent.message || 'Failed to create payment intent');
             }
             
-            console.log('✅ Payment successful:', paymentResult.paymentIntentId);
+            console.log('✅ Payment intent created:', paymentIntent.paymentIntentId);
             
-            // Step 2: Create Order
-            console.log('📦 Step 2: Creating order...');
+            // Step 2: Initialize Payment Sheet
+            console.log('💳 Step 2: Initializing payment sheet...');
+            const { error: initError } = await initPaymentSheet({
+                merchantDisplayName: 'Your Grocery Store',
+                paymentIntentClientSecret: paymentIntent.clientSecret,
+                defaultBillingDetails: {
+                    name: user.name,
+                    email: user.email,
+                },
+                appearance: {
+                    colors: {
+                        primary: '#FF6B2C', // Your primary color
+                    }
+                }
+            });
+            
+            if (initError) {
+                console.error('❌ Init error:', initError);
+                throw new Error(initError.message);
+            }
+            
+            // Step 3: Present Payment Sheet (Customer enters card details)
+            console.log('💳 Step 3: Presenting payment sheet...');
+            const { error: presentError } = await presentPaymentSheet();
+            
+            if (presentError) {
+                // User cancelled payment
+                if (presentError.code === 'Canceled') {
+                    console.log('ℹ️ User cancelled payment');
+                    Alert.alert('Payment Cancelled', 'You can complete your order anytime.');
+                    return; // Don't create order
+                }
+                console.error('❌ Payment error:', presentError);
+                throw new Error(presentError.message);
+            }
+            
+            // Step 4: Payment Successful! Now create order
+            console.log('✅ Payment successful!');
+            console.log('📦 Step 4: Creating order...');
+            
             const orderResult = await createOrder(
-                paymentResult.paymentIntentId,
+                paymentIntent.paymentIntentId,
                 items,
                 user.accountId,
                 finalTotal,
@@ -87,13 +126,12 @@ export default function Cart() {
             
             console.log('✅ Order created:', orderResult.orderId);
             
-            // Step 3: Clear cart
+            // Step 5: Clear cart and show success
             clearCart();
             
-            // Step 4: Show success
             Alert.alert(
-                'Order Placed! 🎉',
-                `Your order has been placed successfully!\n\nOrder ID: ${orderResult.orderId.slice(0, 8)}...\nTotal: R${finalTotal.toFixed(2)}`,
+                'Payment Successful! 🎉',
+                `Your order has been placed and paid!\n\nOrder ID: ${orderResult.orderId.slice(0, 8)}...\nTotal Paid: R${finalTotal.toFixed(2)}`,
                 [
                     {
                         text: 'Continue Shopping',
@@ -105,7 +143,7 @@ export default function Cart() {
         } catch (error: any) {
             console.error('❌ Checkout error:', error);
             Alert.alert(
-                'Checkout Failed',
+                'Payment Failed',
                 error.message || 'Something went wrong. Please try again.'
             );
         } finally {
@@ -169,7 +207,7 @@ export default function Cart() {
                             />
                         </View>
                         
-                        {/* Checkout Button with Processing State */}
+                        {/* Checkout Button */}
                         <TouchableOpacity
                             className={cn(
                                 "p-4 rounded-xl items-center",
@@ -182,12 +220,12 @@ export default function Cart() {
                                 <View className="flex-row items-center gap-2">
                                     <ActivityIndicator color="#fff" />
                                     <Text className="paragraph-bold text-white">
-                                        Processing Order...
+                                        Processing Payment...
                                     </Text>
                                 </View>
                             ) : (
                                 <Text className="paragraph-bold text-white">
-                                    Proceed to Checkout - R{finalTotal.toFixed(2)}
+                                    Proceed to Payment - R{finalTotal.toFixed(2)}
                                 </Text>
                             )}
                         </TouchableOpacity>

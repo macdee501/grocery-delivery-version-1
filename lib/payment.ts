@@ -4,9 +4,10 @@ import { FUNCTION_IDS } from '@/constants/functions';
 
 const functions = new Functions(client);
 
-export const processPayment = async (amount: number, description: string) => {
+// Create payment intent (backend prepares payment)
+export const createPaymentIntent = async (amount: number, description: string) => {
   try {
-    console.log('💳 Processing payment...', amount);
+    console.log('💳 Creating payment intent...', amount);
     
     const response = await functions.createExecution(
       FUNCTION_IDS.STRIPE_PAYMENT,
@@ -18,15 +19,16 @@ export const processPayment = async (amount: number, description: string) => {
     );
     
     const result = JSON.parse(response.responseBody);
-    console.log('✅ Payment result:', result);
+    console.log('✅ Payment intent created:', result);
     
     return result;
   } catch (error) {
-    console.error('❌ Payment error:', error);
+    console.error('❌ Payment intent error:', error);
     throw error;
   }
 };
 
+// Create order (after payment succeeds)
 export const createOrder = async (
   paymentId: string,
   items: any[],
