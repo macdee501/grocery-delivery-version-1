@@ -3,6 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import useAuthStore from '@/store/auth.store'
 import { Functions } from 'react-native-appwrite';
 import { client } from '@/lib/appwrite';
+import { router } from 'expo-router';
+
 
 interface MenuItem {
     id: string;
@@ -70,7 +72,7 @@ export default function Profile() {
             id: '2',
             title: 'Order History',
             icon: '📦',
-            onPress: () => console.log('Order History')
+            onPress: () => router.push('/orders')
         },
         {
             id: '3',
@@ -82,7 +84,7 @@ export default function Profile() {
             id: '4',
             title: 'Settings',
             icon: '⚙️',
-            onPress: () => console.log('Settings')
+            onPress: () => router.push('/settings')
         },
     ];
     
@@ -156,17 +158,7 @@ export default function Profile() {
                         <Text className="paragraph-bold text-dark-100 mb-3">
                             Account Settings
                         </Text>
-
-                        <TouchableOpacity
-                        className='bg-blue-500 p-4 rounded-xl mb-4'
-                        onPress={testHelloWorld}
-                        >
-                          <Text
-                          className='text-white text-center font-bold'
-                          >
-                            Test Hello WOrld funtion 
-                          </Text>
-                        </TouchableOpacity>
+                    
                     </View>
                 )}
                 ListFooterComponent={() => (
