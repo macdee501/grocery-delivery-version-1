@@ -16,31 +16,6 @@ interface MenuItem {
 export default function Profile() {
     const { user, signOutUser, isLoading } = useAuthStore();
 
-
-    const testHelloWorld = async ()=>{
-      try{
-        console.log('testing hello-world function');
-
-        const functions = new Functions(client)
-
-        const response = await functions.createExecution(
-          '695a57b800041d4f2a66',
-          JSON.stringify({name:user?.name||"Guest"})
-        );
-
-        console.log('Raw response:', response);
-
-        const result = JSON.parse(response.responseBody);
-        console.log('Parsed result',result);
-
-        Alert.alert('Success',result.message);
-      }
-      catch(error)
-      {
-        console.error('❌ Function error:', error);
-            Alert.alert('Error', error.message || 'Function call failed');
-      }
-    }
     
     const handleSignOut = async () => {
         Alert.alert(
@@ -72,7 +47,7 @@ export default function Profile() {
             id: '2',
             title: 'Order History',
             icon: '📦',
-            onPress: () => router.push('/orders')
+            onPress: () => router.push('/(protected)/order-history')
         },
         {
             id: '3',

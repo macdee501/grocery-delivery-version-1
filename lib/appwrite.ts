@@ -10,6 +10,7 @@ export const appwriteConfig = {
     userWithMoreAttributesId: '695fcfbc00060332df29',
     categoriesTableId: '6960c007003e37257a63',
     shopProductsTableId: '6960c0f1002811bfd6ac',
+    ordersTableId:"695bb514002d5aacad77",
     
 }
 
@@ -134,3 +135,52 @@ export const getCategories = async () => {
         throw new Error(e as string);
     }
 };
+
+// Get user orders
+export const getUserOrders = async (userId:string)=>{
+try{
+
+    console.log('🔍 Attempting to fetch orders for userId:', userId);
+    console.log('📊 Database ID:', appwriteConfig.databaseId);
+    console.log('📋 Collection ID:', appwriteConfig.ordersTableId);
+
+    // try to get all order and store them
+    const orders = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.ordersTableId,
+        [
+            Query.equal('userId',userId),
+            Query.orderDesc('$createdAt'),
+            Query.limit(15),
+        ]
+    );
+
+    return orders.documents;
+}
+catch(error)
+{
+    console.error('getUserOrders error:', error);
+    throw new Error(error as string);
+}
+}
+
+
+
+// Get order detail
+export const getOrderById=async(orderId:string)=>{
+    try{
+        const order= await databases.getDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.ordersTableId,
+            orderId
+        );
+
+        return order;
+    }
+    catch(error)
+    {
+        console.error('getOrderById error:', error);
+        throw new Error(error as string);
+    }
+}
+

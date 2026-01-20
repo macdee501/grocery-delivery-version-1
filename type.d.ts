@@ -20,6 +20,7 @@ export interface User extends Models.Document {
     name: string;
     email: string;
     avatar: string;
+    accountId:string;
 }
 
 export interface CartCustomization {
@@ -114,4 +115,24 @@ export interface Product{
     image?: string;
     category: string;
     description?: string;
+}
+
+// Add these Order-related interfaces
+export interface OrderItem {
+    id: string;
+    name: string;
+    image_url?: string;
+    quantity: number;
+    price: number;
+}
+
+export interface Order extends Models.Document {
+    userId: string;
+    items:string;
+    totalAmount: number;
+    status: 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+    stripePaymentId: string;
+    deliveryFee: number;
+    discount: number;
+    currency:string;
 }
