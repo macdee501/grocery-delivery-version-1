@@ -26,7 +26,7 @@ export default function Tabslayout() {
         <Tabs.Screen
         name='search'
         options={{
-            title:"Search"
+            title:"Shop"
         }}
         />
         <Tabs.Screen

@@ -37,6 +37,11 @@ export default function SignInScreen() {
 
   return (
     <View className='gap-10 bg-white rounded-lg p-5 mt-5'>
+        <View>
+            <Text className=''>
+                Login 
+            </Text>
+        </View>
         <CustomInputField
         placeholder='Enter Email'
         value={form.email}

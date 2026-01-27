@@ -74,7 +74,7 @@ export const offers = [
     },
     {
         id: 2,
-        title: "Company Specil 2",
+        title: "Company Special 2",
         image: burgerTwo,
         color: "#DF5A0C",
     },
