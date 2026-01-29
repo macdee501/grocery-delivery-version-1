@@ -1,73 +1,84 @@
-import {View, Text, Button, Alert} from 'react-native'
-import {Link, router} from "expo-router";
-import CustomButton from "@/components/CustomButton";
-import {useState} from "react";
+import { Alert, Text, View } from 'react-native';
+import { Link, router } from 'expo-router';
+import { useState, useEffect } from 'react';
 import CustomInputField from '@/components/CustomInputField';
+import CustomButton from '@/components/CustomButton';
 import { createUser } from '@/lib/appwrite';
 import useAuthStore from '@/store/auth.store';
 
-const SignUp = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [form, setForm] = useState({ name: '', email: '', password: '' });
-    const { fetchAuthenticatedUser } = useAuthStore();
-    const submit = async () => {
-        const { name, email, password } = form;
+export default function SignUpScreen() {
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { fetchAuthenticatedUser, isAuthenticated, user, isLoading } = useAuthStore();
 
-        if(!name || !email || !password) return Alert.alert('Error', 'Please enter valid email address & password.');
-
-        setIsSubmitting(true)
-
-        try {
-
-            await createUser({email,password,name})
-            await fetchAuthenticatedUser();
-            router.replace('/sign-in');
-        } catch(error: any) {
-            Alert.alert('Error', error.message);
-        } finally {
-            setIsSubmitting(false);
-        }
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      router.replace('/(tabs)');
     }
+  }, [isAuthenticated, user, isLoading]);
 
+  const submitForm = async () => {
+    const { name, email, password } = form;
+    if (!name || !email || !password) return Alert.alert('Error', 'All fields are required.');
+
+    setIsSubmitting(true);
+    try {
+      await createUser({ name, email, password });
+      await fetchAuthenticatedUser();
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Could not create account.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading || (isAuthenticated && user)) {
     return (
-        <View className="gap-10 bg-white rounded-lg p-5 mt-5">
-            <CustomInputField
-                placeholder="Enter your full name"
-                value={form.name}
-                onChangeText={(text) => setForm((prev) => ({ ...prev, name: text }))}
-                label="Full name"
-            />
-            <CustomInputField
-                placeholder="Enter your email"
-                value={form.email}
-                onChangeText={(text) => setForm((prev) => ({ ...prev, email: text }))}
-                label="Email"
-                keyboardType="email-address"
-            />
-            <CustomInputField
-                placeholder="Enter your password"
-                value={form.password}
-                onChangeText={(text) => setForm((prev) => ({ ...prev, password: text }))}
-                label="Password"
-                secureTextEntry={true}
-            />
+      <View className="flex-1 justify-center items-center bg-white">
+        <Text className="text-gray-600 mt-4">Checking authentication...</Text>
+      </View>
+    );
+  }
 
-            <CustomButton
-                title="Sign Up"
-                isLoading={isSubmitting}
-                onPress={submit}
-            />
+  return (
+    <View className="gap-8 bg-white rounded-lg p-5 mt-5">
+      <CustomInputField
+        label="Full Name"
+        placeholder="Enter your full name"
+        value={form.name}
+        onChangeText={(text) => setForm((prev) => ({ ...prev, name: text }))}
+      />
 
-            <View className="flex justify-center mt-5 flex-row gap-2">
-                <Text className="base-regular text-gray-100">
-                    Already have an account?
-                </Text>
-                <Link href="/sign-in" className="base-bold text-primary">
-                    Sign In
-                </Link>
-            </View>
-        </View>
-    )
+      <CustomInputField
+        label="Email"
+        placeholder="Enter your email"
+        value={form.email}
+        onChangeText={(text) => setForm((prev) => ({ ...prev, email: text }))}
+        keyboardType="email-address"
+      />
+
+      <CustomInputField
+        label="Password"
+        placeholder="Enter your password"
+        value={form.password}
+        onChangeText={(text) => setForm((prev) => ({ ...prev, password: text }))}
+        secureTextEntry
+      />
+
+      <CustomButton
+        title="Sign Up"
+        isLoading={isSubmitting}
+        onPress={submitForm}
+      />
+
+      <View className="flex-row justify-center gap-2 mt-5">
+        <Text className="base-regular text-gray-600">Already have an account?</Text>
+        <Link href="/sign-in" className="base-bold text-lime-500">
+          Sign In
+        </Link>
+      </View>
+    </View>
+  );
 }
-
-export default SignUp

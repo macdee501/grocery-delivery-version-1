@@ -1,36 +1,37 @@
-import { StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
-import { CustomInputProps } from '@/type'
-import cn from 'clsx'
+import { TextInput, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { CustomInputProps } from '@/type';
+import cn from 'clsx';
 
-
-
-export default function CustomInputField({placeholder = 'Enter text',
-    value,
-    onChangeText,
-    label,
-    secureTextEntry = false,
-    keyboardType="default"}: CustomInputProps) {
-        const [isFocused, setIsFocused] = useState(false);
-
+export default function CustomInputField({
+  placeholder = 'Enter text',
+  value,
+  onChangeText,
+  label,
+  secureTextEntry = false,
+  keyboardType = "default",
+}: CustomInputProps) {
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <View className='w-full'>
-      <Text className='label'>{label}</Text>
-
+    <View className="w-full mb-4">
+      {label && <Text className="text-gray-700 font-semibold mb-1">{label}</Text>}
       <TextInput
-      autoCapitalize='none'
-      autoCorrect={false}
-      value={value}
-      onChangeText={onChangeText}
-      keyboardType={keyboardType}
-      onFocus={()=> setIsFocused(true)}
-      onBlur={()=> setIsFocused(false)}
-      placeholder={placeholder}
-      placeholderTextColor="#888"
-      className={cn("input",isFocused?"border-primary":"border-gray-300")}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={keyboardType}
+        secureTextEntry={secureTextEntry}
+        autoCapitalize="none"
+        autoCorrect={false}
+        placeholder={placeholder}
+        placeholderTextColor="#888"
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className={cn(
+          "bg-white rounded-xl px-4 py-3 border",
+          isFocused ? "border-lime-400 shadow-md" : "border-gray-300"
+        )}
       />
     </View>
-  )
+  );
 }
-

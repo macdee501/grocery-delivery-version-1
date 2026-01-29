@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, Image, Platform } from 'react-native'
+import { Text, TouchableOpacity, Image, Platform } from 'react-native';
 import { Product } from "@/type";
 import { appwriteConfig } from "@/lib/appwrite";
 import { useCartStore } from "@/store/cart.store";
@@ -17,7 +17,6 @@ const ProductCard = ({ item }: ProductCardProps) => {
     
     const { addItem } = useCartStore();
     
-    // Navigate to product details when card is pressed
     const handleCardPress = () => {
         router.push({
             pathname: '/product-details/[id]',
@@ -25,9 +24,8 @@ const ProductCard = ({ item }: ProductCardProps) => {
         });
     };
     
-    // Add to cart (prevent navigation)
     const handleAddToCart = (e: any) => {
-        e?.stopPropagation?.(); // Prevent card press from triggering
+        e?.stopPropagation?.();
         addItem({
             id: $id, 
             name, 
@@ -44,34 +42,41 @@ const ProductCard = ({ item }: ProductCardProps) => {
             onPress={handleCardPress} 
             activeOpacity={0.7}
         >
+            {/* Product Image */}
             <Image 
                 source={{ uri: imageUrl }} 
                 className="size-32 absolute -top-10" 
                 resizeMode="contain" 
             />
             
+            {/* Category */}
             {category && (
-                <Text className="text-xs text-gray-400 uppercase mb-1">
+                <Text className="small-bold text-gray-100 uppercase mb-1">
                     {category}
                 </Text>
             )}
             
+            {/* Product Name */}
             <Text 
-                className="text-center base-bold text-dark-100 mb-2" 
+                className="base-bold text-dark-100 text-center mb-2" 
                 numberOfLines={1}
             >
                 {name}
             </Text>
             
-            <Text className="body-regular text-gray-200 mb-4">
+            {/* Price */}
+            <Text className="body-regular text-gray-100 mb-4">
                 R{price.toFixed(2)}
             </Text>
             
+            {/* Add to Cart */}
             <TouchableOpacity onPress={handleAddToCart}>
-                <Text className="paragraph-bold text-primary">Add to Cart +</Text>
+                <Text className="text-primary font-quicksand-bold text-base">
+                    Add to Cart +
+                </Text>
             </TouchableOpacity>
         </TouchableOpacity>
-    )
+    );
 }
 
 export default ProductCard;

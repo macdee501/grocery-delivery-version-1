@@ -7,32 +7,28 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
-      // custom colours
       colors: {
-        primary: "#FE8C00",
-        white: {
-          DEFAULT: "#ffffff",
-          100: "#fafafa",
-          200: "#FE8C00",
+        primary: "#FE8C00",         // main brand color
+        background: "#ffffff",      // default white background
+        backgroundLight: "#FAFAFA", // light background
+        dark: {
+          100: "#181C2E",           // dark text / bg
         },
         gray: {
-          100: "#878787",
-          200: "#878787",
-        },
-        dark: {
-          100: "#181C2E",
+          100: "#878787",           // text gray
+          200: "#B0B0B0",           // lighter gray
         },
         error: "#F14141",
         success: "#2F9B65",
       },
       fontFamily: {
-        quicksand: ["Quicksand-Regular", "sans-serif"],
-        "quicksand-bold": ["Quicksand-Bold", "sans-serif"],
-        "quicksand-semibold": ["Quicksand-SemiBold", "sans-serif"],
-        "quicksand-light": ["Quicksand-Light", "sans-serif"],
-        "quicksand-medium": ["Quicksand-Medium", "sans-serif"],
+        quicksand: "Quicksand-Regular",
+        "quicksand-bold": "Quicksand-Bold",
+        "quicksand-semibold": "Quicksand-SemiBold",
+        "quicksand-medium": "Quicksand-Medium",
+        "quicksand-light": "Quicksand-Light",
       },
     },
   },
   plugins: [],
-}
+};

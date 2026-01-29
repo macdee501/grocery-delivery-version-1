@@ -1,39 +1,47 @@
-import { Dimensions, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { Redirect, Slot } from 'expo-router';
+import { Dimensions, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import React from 'react';
+import { Slot, Redirect } from 'expo-router';
 import { images } from '@/constants';
 import useAuthStore from '@/store/auth.store';
 
 export default function AuthLayout() {
+  const { isAuthenticated } = useAuthStore();
 
-    const { isAuthenticated } = useAuthStore();
+  // Redirect logged-in users away from auth pages
+  if (isAuthenticated) return <Redirect href="/(tabs)" />;
 
-    if(isAuthenticated) return <Redirect href="/" />
-    
   return (
     <KeyboardAvoidingView
-    behavior={Platform.OS == "ios" ? "padding": "height"}>
-        <ScrollView 
-        className='bg-white h-full'
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 bg-gray-50"
+    >
+      <ScrollView
+        className="h-full"
         keyboardShouldPersistTaps="handled"
+      >
+        {/* Top Header Graphic */}
+        <View
+          className="w-full relative"
+          style={{ height: Dimensions.get('screen').height / 2.5 }}
         >
-            <View className='w-full relative'
-            style={{height:Dimensions.get('screen').height/2.25}}>
-                <ImageBackground
-                source={images.loginGraphic}
-                className='size-full rounded-b-lg'
-                resizeMode='stretch'
-                />
+          <ImageBackground
+            source={images.siteHeader} // <-- replace with your site header graphic
+            className="size-full rounded-b-3xl"
+            resizeMode="cover"
+          />
 
-                {/* Company Logo */}
-                <Image
-                source={images.logo}
-                className='self-center sie-48 absolute -bottom-16 z-10'
-                />
-            </View>
-            <Slot/>
-        </ScrollView>
+          {/* Avocado Logo */}
+          <Image
+            source={images.avocado} // <-- your avocado logo
+            className="self-center size-48 absolute -bottom-16 z-10"
+          />
+        </View>
+
+        {/* Slot for Sign In / Sign Up forms */}
+        <View className="px-5 -mt-12">
+          <Slot />
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
-  )
+  );
 }
-
