@@ -6,11 +6,12 @@ export const appwriteConfig = {
     projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!,
     platform: "com.pain.grocerydelivery",
     databaseId: '695a370a00012c4487d0',
-    bucketId: '68643e170015edaa95d7',
+    bucketId: '6979a56500356949b236',
     userWithMoreAttributesId: '695fcfbc00060332df29',
     categoriesTableId: '6960c007003e37257a63',
     shopProductsTableId: '6960c0f1002811bfd6ac',
     ordersTableId:"695bb514002d5aacad77",
+    offersTableId:"697bc2a40004ff123ef7",
     
 }
 
@@ -79,29 +80,36 @@ export const signIn = async ({ email, password }: SignInParams) => {
     }
 }
 
-// function to test currently signed in user
 export const getCurrentUser = async () => {
     try {
-        const currentAccount = await account.get();
-       
-        console.log('✅ Current account ID:', currentAccount.$id);
-       
-        if(!currentAccount) throw Error;
-
-        const currentUser = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.userWithMoreAttributesId,
-            [Query.equal('accountId', currentAccount.$id)]
-        )
-
-        if(!currentUser) throw Error;
-
-        return currentUser.documents[0];
-    } catch (e) {
-        console.log(e);
-        throw new Error(e as string);
+      const accountData = await account.get();
+  
+      // User IS authenticated if this succeeds
+      const userDoc = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.userWithMoreAttributesId,
+        [Query.equal("accountId", accountData.$id)]
+      );
+  
+      // If no profile document exists — that's OK
+      if (userDoc.documents.length === 0) {
+        console.log("⚠️ No user profile document found — using account only");
+  
+        return {
+          $id: accountData.$id,
+          email: accountData.email,
+          name: accountData.name,
+          accountOnly: true,
+        };
+      }
+  
+      return userDoc.documents[0];
+    } catch (error) {
+      console.log("❌ getCurrentUser error:", error);
+      return null;
     }
-}
+  };
+  
 
 // function to sign out user
 export const signOut = async () => {
@@ -198,4 +206,31 @@ export const getOrderById=async(orderId:string)=>{
         throw new Error(error as string);
     }
 }
+
+export const getHomeOffers = async () => {
+    try {
+      const res = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.offersTableId
+      );
+  
+  
+      return res.documents;
+    } catch (error) {
+      console.error("getHomeOffers error:", error);
+      return [];
+    }
+  };
+  
+
+  export const getFileView = (fileId: string) => {
+    return storage.getFileView(
+      appwriteConfig.bucketId,
+      fileId
+    ).href;
+  };
+  
+  
+  
+  
 
