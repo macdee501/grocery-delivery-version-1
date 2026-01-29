@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import {User} from "@/type";
-import {getCurrentUser, signOut} from "@/lib/appwrite";
+import { User } from "@/type";
+import { getCurrentUser, signOut } from "@/lib/appwrite";
 
 type AuthState = {
     isAuthenticated: boolean;
@@ -22,41 +22,60 @@ const useAuthStore = create<AuthState>((set) => ({
 
     setIsAuthenticated: (value) => set({ isAuthenticated: value }),
     setUser: (user) => set({ user }),
-    setLoading: (value) => set({isLoading: value}),
+    setLoading: (value) => set({ isLoading: value }),
 
     fetchAuthenticatedUser: async () => {
-        set({isLoading: true});
+        console.log('🔄 fetchAuthenticatedUser started');
+        set({ isLoading: true });
 
         try {
             const user = await getCurrentUser();
+            console.log('👤 getCurrentUser result:', user ? `User ID: ${user.$id}` : 'No user');
 
-            if(user) set({ isAuthenticated: true, user: user as User })
-            else set( { isAuthenticated: false, user: null } );
+            if (user) {
+                console.log('✅ Setting authenticated state with user:', user.email);
+                set({ 
+                    isAuthenticated: true, 
+                    user: user as User,
+                    isLoading: false  // ✅ Set loading false here too
+                });
+            } else {
+                console.log('❌ No user found, setting unauthenticated');
+                set({ 
+                    isAuthenticated: false, 
+                    user: null,
+                    isLoading: false  // ✅ Set loading false here too
+                });
+            }
         } catch (e) {
-            console.log('fetchAuthenticatedUser error', e);
-            set({ isAuthenticated: false, user: null })
-        } finally {
-            set({ isLoading: false });
+            console.log('❌ fetchAuthenticatedUser error:', e);
+            set({ 
+                isAuthenticated: false, 
+                user: null,
+                isLoading: false  // ✅ Set loading false here too
+            });
         }
+        
+        // Log final state
+        console.log('📊 Final auth state after fetch');
     },
 
-     signOutUser: async () => {
+    signOutUser: async () => {
         set({ isLoading: true });
         
         try {
             await signOut();
             set({ 
                 isAuthenticated: false, 
-                user: null 
+                user: null,
+                isLoading: false
             });
-            console.log('Signed out and cleared state');
+            console.log('✅ Signed out and cleared state');
         } catch (error) {
-            console.error('Sign out error:', error);
-        } finally {
+            console.error('❌ Sign out error:', error);
             set({ isLoading: false });
         }
     }
-   
 }))
 
 export default useAuthStore;

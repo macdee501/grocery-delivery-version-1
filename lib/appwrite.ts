@@ -57,11 +57,25 @@ export const createUser = async ({ email, password, name }: CreateUserParams) =>
 // function to sign in and create a session
 export const signIn = async ({ email, password }: SignInParams) => {
     try {
+        // Check if there's an existing session
+        try {
+            const existingSession = await account.get();
+            if (existingSession) {
+                console.log('⚠️ Existing session found, deleting...');
+                await account.deleteSession('current');
+            }
+        } catch (error) {
+            // No existing session, which is fine
+            console.log('ℹ️ No existing session');
+        }
+
+        // Create new session
         const session = await account.createEmailPasswordSession(email, password);
-        console.log('✅ Session created successfully:', session.$id)
+        console.log('✅ Session created successfully:', session.$id);
         return session;
-    } catch (e) {
-        throw new Error(e as string);
+    } catch (e: any) {
+        console.error('❌ Sign in error:', e);
+        throw new Error(e.message || e);
     }
 }
 
@@ -138,6 +152,7 @@ export const getCategories = async () => {
 
 // Get user orders
 export const getUserOrders = async (userId:string)=>{
+
 try{
 
     console.log('🔍 Attempting to fetch orders for userId:', userId);
