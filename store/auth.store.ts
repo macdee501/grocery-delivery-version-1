@@ -1,14 +1,15 @@
 import { create } from "zustand";
 import { User } from "@/type";
-import { getCurrentUser, signOut } from "@/lib/appwrite";
+import { getCurrentUser, signOut, signIn as appwriteSignIn } from "@/lib/appwrite";
 
 type AuthState = {
   isAuthenticated: boolean;
   user: User | null;
   isLoading: boolean;
 
-  fetchAuthenticatedUser: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   signOutUser: () => Promise<void>;
+  fetchAuthenticatedUser: () => Promise<void>;
 };
 
 const useAuthStore = create<AuthState>((set) => ({
@@ -16,57 +17,43 @@ const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: true,
 
+  // Fetch user session on app start (optional)
   fetchAuthenticatedUser: async () => {
-    console.log("🔄 fetchAuthenticatedUser started");
-
     set({ isLoading: true });
-
     try {
       const user = await getCurrentUser();
-
       if (user) {
-        console.log("✅ Authenticated user restored");
-
-        set({
-          isAuthenticated: true,
-          user: user as User,
-          isLoading: false,
-        });
+        set({ isAuthenticated: true, user: user as User, isLoading: false });
       } else {
-        console.log("🚫 No session found");
-
-        set({
-          isAuthenticated: false,
-          user: null,
-          isLoading: false,
-        });
+        set({ isAuthenticated: false, user: null, isLoading: false });
       }
     } catch (error) {
-      console.log("❌ Auth restore failed:", error);
+      console.error("❌ Auth restore failed:", error);
+      set({ isAuthenticated: false, user: null, isLoading: false });
+    }
+  },
 
-      set({
-        isAuthenticated: false,
-        user: null,
-        isLoading: false,
-      });
+  login: async (email: string, password: string) => {
+    set({ isLoading: true });
+    try {
+      await appwriteSignIn({ email, password });
+      const user = await getCurrentUser();
+      if (!user) throw new Error("Failed to fetch user after login");
+      set({ isAuthenticated: true, user: user as User, isLoading: false });
+    } catch (error: any) {
+      console.error("❌ Login failed:", error);
+      set({ isAuthenticated: false, user: null, isLoading: false });
+      throw error;
     }
   },
 
   signOutUser: async () => {
     set({ isLoading: true });
-
     try {
       await signOut();
-
-      set({
-        isAuthenticated: false,
-        user: null,
-        isLoading: false,
-      });
-
-      console.log("✅ Signed out successfully");
+      set({ isAuthenticated: false, user: null, isLoading: false });
     } catch (error) {
-      console.error("❌ Sign out error:", error);
+      console.error("❌ Sign out failed:", error);
       set({ isLoading: false });
     }
   },

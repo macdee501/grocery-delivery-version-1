@@ -1,51 +1,36 @@
-import { Alert, ActivityIndicator, Text, View } from 'react-native';
-import { Link, router } from 'expo-router';
-import { useState, useEffect } from 'react';
+import { Alert, Text, View, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import CustomInputField from '@/components/CustomInputField';
 import CustomButton from '@/components/CustomButton';
-import { signIn } from '@/lib/appwrite';
 import useAuthStore from '@/store/auth.store';
 
 export default function SignInScreen() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { fetchAuthenticatedUser, isAuthenticated, user, isLoading } = useAuthStore();
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
-      router.replace('/(tabs)');
-    }
-  }, [isAuthenticated, user, isLoading]);
+  const login = useAuthStore((state) => state.login);
 
-  const submitForm = async () => {
+  const handleLogin = async () => {
     const { email, password } = form;
-    if (!email || !password) return Alert.alert('Error', 'Please enter valid email & password.');
+    if (!email || !password) {
+      return Alert.alert('Error', 'All fields are required.');
+    }
 
     setIsSubmitting(true);
     try {
-      await signIn({ email, password });
-      await fetchAuthenticatedUser();
-      router.replace('/(tabs)');
+      await login(email, password);
+      router.replace('/(tabs)'); // Navigate to main app
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Could not sign in.');
+      Alert.alert('Login Failed', error.message || 'Invalid credentials.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading || (isAuthenticated && user)) {
-    return (
-      <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#A3E635" />
-        <Text className="mt-4 text-gray-600">Checking authentication...</Text>
-      </View>
-    );
-  }
-
   return (
-    <View className="gap-8 bg-white rounded-lg p-5 mt-5">
-      <Text className="h2-bold text-dark-100">Login</Text>
+    <View className="flex-1 gap-6 bg-white p-5 pt-12">
+      <Text className="text-2xl font-bold text-gray-900 mb-4">Sign In</Text>
 
       <CustomInputField
         label="Email"
@@ -66,14 +51,14 @@ export default function SignInScreen() {
       <CustomButton
         title="Sign In"
         isLoading={isSubmitting}
-        onPress={submitForm}
+        onPress={handleLogin}
       />
 
-      <View className="flex-row justify-center gap-2 mt-5">
-        <Text className="base-regular text-gray-600">Don't have an account?</Text>
-        <Link href="/sign-up" className="base-bold text-lime-500">
-          Sign Up
-        </Link>
+      <View className="flex-row justify-center mt-6">
+        <Text className="text-gray-600">Don't have an account? </Text>
+        <TouchableOpacity onPress={() => router.push('/sign-up')}>
+          <Text className="text-lime-500 font-bold">Sign Up</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

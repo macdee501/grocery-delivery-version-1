@@ -28,7 +28,7 @@ export default function CustomInputField({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         className={cn(
-          "bg-white rounded-xl px-4 py-3 border",
+          "bg-white rounded-xl px-4 py-3 border text-gray-900",
           isFocused ? "border-lime-400 shadow-md" : "border-gray-300"
         )}
       />

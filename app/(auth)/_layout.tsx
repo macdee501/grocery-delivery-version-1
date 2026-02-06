@@ -12,33 +12,35 @@ export default function AuthLayout() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-gray-50"
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0} // tweak if keyboard still covers
     >
       <ScrollView
-        className="h-full"
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start' }}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         {/* Top Header Graphic */}
         <View
-          className="w-full relative"
           style={{ height: Dimensions.get('screen').height / 2.5 }}
+          className="w-full relative"
         >
           <ImageBackground
-            source={images.siteHeader} // <-- replace with your site header graphic
+            source={images.siteHeader}
             className="size-full rounded-b-3xl"
             resizeMode="cover"
           />
 
           {/* Avocado Logo */}
           <Image
-            source={images.avocado} // <-- your avocado logo
+            source={images.avocado}
             className="self-center size-48 absolute -bottom-16 z-10"
           />
         </View>
 
         {/* Slot for Sign In / Sign Up forms */}
-        <View className="px-5 -mt-12">
+        <View className="px-5 -mt-12 flex-1 justify-center">
           <Slot />
         </View>
       </ScrollView>

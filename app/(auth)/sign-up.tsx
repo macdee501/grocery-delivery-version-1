@@ -1,49 +1,50 @@
-import { Alert, Text, View } from 'react-native';
-import { Link, router } from 'expo-router';
-import { useState, useEffect } from 'react';
+import { Alert, Text, View, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import CustomInputField from '@/components/CustomInputField';
 import CustomButton from '@/components/CustomButton';
-import { createUser } from '@/lib/appwrite';
 import useAuthStore from '@/store/auth.store';
+import { createUser } from '@/lib/appwrite';
 
 export default function SignUpScreen() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { fetchAuthenticatedUser, isAuthenticated, user, isLoading } = useAuthStore();
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
-      router.replace('/(tabs)');
-    }
-  }, [isAuthenticated, user, isLoading]);
+  const { isLoading, isAuthenticated } = useAuthStore();
 
   const submitForm = async () => {
     const { name, email, password } = form;
-    if (!name || !email || !password) return Alert.alert('Error', 'All fields are required.');
+    if (!name || !email || !password) {
+      return Alert.alert('Error', 'All fields are required.');
+    }
 
     setIsSubmitting(true);
     try {
       await createUser({ name, email, password });
-      await fetchAuthenticatedUser();
-      router.replace('/(tabs)');
+      Alert.alert(
+        'Account Created!',
+        'Your account was created successfully. You can now log in.',
+        [{ text: 'Go to Login', onPress: () => router.replace('/sign-in') }]
+      );
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Could not create account.');
+      Alert.alert('Error', error.message || 'Failed to create account.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading || (isAuthenticated && user)) {
+  if (isLoading || isAuthenticated) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
-        <Text className="text-gray-600 mt-4">Checking authentication...</Text>
+        <Text className="text-gray-600">Checking authentication...</Text>
       </View>
     );
   }
 
   return (
-    <View className="gap-8 bg-white rounded-lg p-5 mt-5">
+    <View className="flex-1 gap-6 bg-white p-5 pt-12">
+      <Text className="text-2xl font-bold text-gray-900 mb-4">Sign Up</Text>
+
       <CustomInputField
         label="Full Name"
         placeholder="Enter your full name"
@@ -73,11 +74,11 @@ export default function SignUpScreen() {
         onPress={submitForm}
       />
 
-      <View className="flex-row justify-center gap-2 mt-5">
-        <Text className="base-regular text-gray-600">Already have an account?</Text>
-        <Link href="/sign-in" className="base-bold text-lime-500">
-          Sign In
-        </Link>
+      <View className="flex-row justify-center mt-6">
+        <Text className="text-gray-600">Already have an account? </Text>
+        <TouchableOpacity onPress={() => router.push('/sign-in')}>
+          <Text className="text-lime-500 font-bold">Sign In</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

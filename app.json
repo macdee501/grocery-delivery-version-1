@@ -15,14 +15,15 @@
     "android": {
       "package": "com.pain.freshcart",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/avacodologo.png",
+        "backgroundColor": "#E6F4FE"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "static"
     },
     "plugins": [
       "expo-router",
