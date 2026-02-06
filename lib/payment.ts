@@ -30,7 +30,7 @@ export const createPaymentIntent = async (amount: number, description: string) =
 
 // Create order (after payment succeeds)
 export const createOrder = async (
-  paymentId: string,
+  stripePaymentId: string,
   items: any[],
   userId: string,
   totalAmount: number,
@@ -38,18 +38,21 @@ export const createOrder = async (
   discount: number
 ) => {
   try {
-    console.log('📦 Creating order...', paymentId);
+    console.log('📦 Creating order...', stripePaymentId);
+
+     // Map stripePaymentId → paymentId to satisfy cloud function
+     const payload = {
+      paymentId: stripePaymentId, 
+      items,
+      userId,
+      totalAmount,
+      deliveryFee,
+      discount,
+    };
     
     const response = await functions.createExecution(
       FUNCTION_IDS.CREATE_ORDER,
-      JSON.stringify({
-        paymentId,
-        items,
-        userId,
-        totalAmount,
-        deliveryFee,
-        discount
-      })
+      JSON.stringify(payload)
     );
     
     const result = JSON.parse(response.responseBody);

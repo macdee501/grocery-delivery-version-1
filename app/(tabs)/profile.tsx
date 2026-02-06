@@ -29,10 +29,10 @@ export default function Profile() {
   };
 
   const menuItems: MenuItem[] = [
-    { id: '1', title: 'Edit Profile', icon: '✏️', onPress: () => console.log('Edit Profile') },
+    // { id: '1', title: 'Edit Profile', icon: '✏️', onPress: () => console.log('Edit Profile') },
     { id: '2', title: 'Order History', icon: '📦', onPress: () => router.push('/(protected)/order-history') },
-    { id: '3', title: 'Payment Methods', icon: '💳', onPress: () => console.log('Payment Methods') },
-    { id: '4', title: 'Settings', icon: '⚙️', onPress: () => router.push('/settings') },
+    // { id: '3', title: 'Payment Methods', icon: '💳', onPress: () => console.log('Payment Methods') },
+    // { id: '4', title: 'Settings', icon: '⚙️', onPress: () => router.push('/settings') },
   ];
 
   if (!user) {

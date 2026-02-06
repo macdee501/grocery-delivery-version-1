@@ -125,25 +125,33 @@ export const signOut = async () => {
 
 export const getProducts = async ({ category, query, limit }: GetProductParams) => {
     try {
-        const queries: string[] = [];
-        
-        if (category) queries.push(Query.equal('category', category));
-        if (query) queries.push(Query.search('name', query));
-        if (limit) queries.push(Query.limit(limit));
-        
-        const products = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.shopProductsTableId, // ← Update this to your products collection ID
-            queries,
-        );
-        
-        return products.documents;
+      const queries: string[] = [];
+  
+      if (category) {
+        queries.push(Query.equal("categories", category));
+      }
+  
+      if (query) {
+        queries.push(Query.search("name", query));
+      }
+  
+      if (limit) {
+        queries.push(Query.limit(limit));
+      }
+  
+      const products = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.shopProductsTableId,
+        queries
+      );
+  
+      return products.documents;
     } catch (e) {
-        console.error('getProducts error:', e);
-        throw new Error(e as string);
+      console.error("getProducts error:", e);
+      throw new Error(e as string);
     }
-};
-
+  };
+  
 export const getCategories = async () => {
     try {
         const categories = await databases.listDocuments(

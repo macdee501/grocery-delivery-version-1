@@ -9,6 +9,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ item }: ProductCardProps) => {
+  if (!item || !item.$id) return null; // Safety check
+
   const { $id, image, name, price, category } = item;
 
   const imageUrl = image
@@ -17,7 +19,6 @@ const ProductCard = ({ item }: ProductCardProps) => {
 
   const { addItem } = useCartStore();
 
-  // Navigate safely
   const handleCardPress = () => {
     try {
       router.push({
@@ -39,9 +40,7 @@ const ProductCard = ({ item }: ProductCardProps) => {
     <TouchableOpacity
       onPress={handleCardPress}
       activeOpacity={0.7}
-      style={[
-        Platform.OS === 'android' ? { elevation: 6, shadowColor: '#000' } : {},
-      ]}
+      style={[Platform.OS === 'android' ? { elevation: 6, shadowColor: '#000' } : {}]}
       className="bg-white rounded-3xl p-4 flex items-center justify-center mb-5"
     >
       <Image
@@ -55,10 +54,12 @@ const ProductCard = ({ item }: ProductCardProps) => {
       )}
 
       <Text className="text-base font-bold text-dark-100 text-center mb-1" numberOfLines={1}>
-        {name}
+        {name || 'Unnamed product'}
       </Text>
 
-      <Text className="text-sm text-gray-500 mb-2">R{price.toFixed(2)}</Text>
+      <Text className="text-sm text-gray-500 mb-2">
+        R{price != null ? price.toFixed(2) : '0.00'}
+      </Text>
 
       <TouchableOpacity
         onPress={handleAddToCart}

@@ -77,18 +77,6 @@ export default function Index() {
         data={offers}
         keyExtractor={(item) => item.$id}
         contentContainerStyle={{ paddingBottom: 28, paddingHorizontal: 20 }}
-        ListHeaderComponent={() => (
-          <View className="flex-between flex-row w-full my-5">
-            <View className="flex-start">
-              <Text className="small-bold text-lime-500">DELIVER TO</Text>
-              <TouchableOpacity className="flex-center flex-row gap-x-1 mt-0.5">
-                <Text className="paragraph-bold text-gray-900">This Address?</Text>
-                <Image source={images.arrowDown} resizeMode="contain" className="size-3" />
-              </TouchableOpacity>
-            </View>
-            <CartButton />
-          </View>
-        )}
         renderItem={({ item }) => (
           <Pressable
             className="w-full h-48 my-3 rounded-2xl overflow-hidden shadow-md flex-row items-center gap-4 bg-white"

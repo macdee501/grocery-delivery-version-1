@@ -1,22 +1,21 @@
 {
   "expo": {
-    "name": "grocery-delivery-version-1",
-    "slug": "grocery-delivery-version-1",
+    "name": "FreshCart",
+    "slug": "freshcart",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "grocerydeliveryversion1",
+    "icon": "./assets/images/avacodologo.png",
+    "scheme": "freshcart",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "bundleIdentifier": "com.pain.freshcart",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.pain.freshcart",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
@@ -24,14 +23,13 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/avacodologo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -42,15 +40,21 @@
       ],
       [
         "@stripe/stripe-react-native",
-      {
-        "merchantIdentifier": "merchant.com.pain.grocerydelivery",
-        "enableGooglePay": true
-      }
-    ]
+        {
+          "merchantIdentifier": "merchant.com.pain.grocerydelivery",
+          "enableGooglePay": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c33657bb-46cb-4f6c-aac8-662da96f7351"
+      }
     }
   }
 }

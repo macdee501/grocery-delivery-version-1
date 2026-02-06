@@ -1,56 +1,102 @@
-import { Text, FlatList, View } from 'react-native';
+import { Text, FlatList, View, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect, useState, useCallback } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import useAppwrite from "@/lib/useAppwrite";
 import { getCategories, getProducts } from "@/lib/appwrite";
-import { useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
-import ProductCard from '@/components/ProductCard';
-import CartButton from "@/components/CartButton";
-import cn from 'clsx';
+import ProductCard from "@/components/ProductCard";
+import cn from "clsx";
 import { Product } from "@/type";
 
 const Search = () => {
-  const { category, query } = useLocalSearchParams<{query: string; category: string}>();
-  
-  const { data, refetch, loading } = useAppwrite({ 
-    fn: getProducts, 
-    params: { category, query, limit: 6 } 
+  const router = useRouter();
+  const { category, query } = useLocalSearchParams<{ query: string; category: string }>();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const { data: categories, loading: loadingCategories } = useAppwrite({ fn: getCategories });
+  const { data: products, refetch, loading: loadingProducts } = useAppwrite({
+    fn: getProducts,
+    params: { category, query, limit: 6 },
   });
-  
-  const { data: categories } = useAppwrite({ fn: getCategories });
-  
+
   useEffect(() => {
     refetch({ category, query, limit: 6 });
   }, [category, query]);
-  
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch({ category, query, limit: 6 });
+    setRefreshing(false);
+  }, [category, query]);
+
   return (
     <SafeAreaView className="bg-white flex-1">
-      <FlatList
-        data={data || []}
-        numColumns={2}
-        columnWrapperClassName="gap-4 px-4"
-        contentContainerClassName="pb-28 pt-5"
-        keyExtractor={(item) => item.$id}
-        renderItem={({ item, index }) => (
-          <View className={cn("flex-1", index % 2 === 0 ? "mt-0" : "mt-4")}>
-            <ProductCard item={item as Product} />
-          </View>
-        )}
-        ListHeaderComponent={() => (
-          <View className="mb-5 px-4 flex-row justify-between items-center">
-            <View>
-              <Text className="text-xs font-bold text-lime-500 uppercase">Search</Text>
-              <Text className="text-base font-semibold text-gray-900 mt-1">Find your groceries</Text>
+      {/* Categories */}
+<View className="pt-3">
+  {loadingCategories ? (
+    <ActivityIndicator size="small" color="#000" />
+  ) : (
+    <FlatList
+      data={[{ $id: "all", name: "All" }, ...(categories || [])]} // Add "All" first
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item) => item.$id}
+      contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
+      renderItem={({ item }) => {
+        const isActive = category === item.$id || (!category && item.$id === "all");
+
+        return (
+          <TouchableOpacity
+            onPress={() =>
+              router.setParams({
+                category: item.$id === "all" ? undefined : item.$id, // Clear category if "All"
+                query,
+              })
+            }
+            className={cn(
+              "px-4 py-2 rounded-full border",
+              isActive ? "bg-black border-black" : "bg-white border-gray-300"
+            )}
+          >
+            <Text
+              className={cn(
+                "text-sm",
+                isActive ? "text-white" : "text-gray-700"
+              )}
+            >
+              {item.name || "Unnamed"}
+            </Text>
+          </TouchableOpacity>
+        );
+      }}
+    />
+  )}
+</View>
+
+
+      {/* Products */}
+      {loadingProducts && !refreshing ? (
+        <View className="flex-1 justify-center items-center mt-10">
+          <ActivityIndicator size="large" color="#000" />
+        </View>
+      ) : (
+        <FlatList
+          data={products || []}
+          keyExtractor={(item) => item.$id}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, gap: 12 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={() => (
+            <View className="items-center mt-10">
+              <Text className="text-gray-400">No products found</Text>
             </View>
-            <CartButton />
-          </View>
-        )}
-        ListEmptyComponent={() => (
-          !loading && (
-            <Text className="text-center text-gray-500 mt-5">No products found</Text>
-          )
-        )}
-      />
+          )}
+          renderItem={({ item }: { item: Product }) => <ProductCard item={item} />}
+        />
+      )}
     </SafeAreaView>
   );
 };

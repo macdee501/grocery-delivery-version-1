@@ -14,11 +14,7 @@ export default function OrderHistoryScreen() {
 
   useEffect(() => {
 
-    console.log('=== USER DEBUG ===')
-    console.log('User Object',user)
-    console.log('User.$id',user?.$id)
-    console.log('====')
-
+  
 
     if(!isAuthenticated)
     {
@@ -36,10 +32,10 @@ export default function OrderHistoryScreen() {
     
     try {
       setLoading(true);
-      console.log('👤 Fetching orders for user ID:', user.accountId);
+      console.log('👤 Fetching orders for user ID:', user.$id);
 
 
-      const response = await getUserOrders(user.accountId);
+      const response = await getUserOrders(user.$id);
 
       console.log('📦 Orders returned:', response.length);
     console.log('📋 Orders data:', JSON.stringify(response, null, 2));

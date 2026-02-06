@@ -34,25 +34,42 @@ export default function Cart() {
       router.push('/sign-in');
       return;
     }
-    if (items.length === 0) {
+  
+    if (!items?.length) {
       Alert.alert('Error', 'Your cart is empty');
       return;
     }
-
+  
+    setIsProcessing(true);
+  
     try {
-      setIsProcessing(true);
-
-      const paymentIntent = await createPaymentIntent(finalTotal, `Grocery order - ${totalItems} items`);
-      if (!paymentIntent.success) throw new Error(paymentIntent.message || 'Failed to create payment intent');
-
+      // 1️⃣ Calculate totals
+      const totalPrice = getTotalPrice();
+      const totalItems = getTotalItems();
+      const deliveryFee = 5.0;
+      const discount = 0.5;
+      const finalTotal = totalPrice + deliveryFee - discount;
+  
+      // 2️⃣ Create payment intent
+      const paymentIntent = await createPaymentIntent(
+        finalTotal,
+        `Grocery order - ${totalItems} items`
+      );
+  
+      if (!paymentIntent?.paymentIntentId)
+        throw new Error('Payment ID is missing from payment intent');
+  
+      // 3️⃣ Initialize Stripe Payment Sheet
       const { error: initError } = await initPaymentSheet({
         merchantDisplayName: 'Your Grocery Store',
         paymentIntentClientSecret: paymentIntent.clientSecret,
         defaultBillingDetails: { name: user.name, email: user.email },
-        appearance: { colors: { primary: '#84CC16' } } // Lime-green button in Stripe
+        appearance: { colors: { primary: '#84CC16' } },
       });
+  
       if (initError) throw new Error(initError.message);
-
+  
+      // 4️⃣ Present Stripe Payment Sheet
       const { error: presentError } = await presentPaymentSheet();
       if (presentError) {
         if (presentError.code === 'Canceled') {
@@ -61,22 +78,39 @@ export default function Cart() {
         }
         throw new Error(presentError.message);
       }
-
-      const orderResult = await createOrder(paymentIntent.paymentIntentId, items, user.accountId, finalTotal, deliveryFee, discount);
-      if (!orderResult.success) throw new Error(orderResult.message || 'Order creation failed');
-
+  
+      // 5️⃣ Create order in Appwrite
+      const orderResult = await createOrder(
+        paymentIntent.paymentIntentId, // ✅ Correct property
+        items,
+        user.$id,                      // ✅ Correct user ID
+        finalTotal,
+        deliveryFee,
+        discount
+      );
+  
+      if (!orderResult?.success)
+        throw new Error(orderResult?.message || 'Order creation failed');
+  
+      // 6️⃣ Clear cart and show success
       clearCart();
       Alert.alert(
         'Payment Successful! 🎉',
-        `Your order has been placed and paid!\n\nOrder ID: ${orderResult.orderId.slice(0, 8)}...\nTotal Paid: R${finalTotal.toFixed(2)}`,
+        `Your order has been placed and paid!\n\nOrder ID: ${orderResult.orderId?.slice(
+          0,
+          8
+        )}...\nTotal Paid: R${finalTotal.toFixed(2)}`,
         [{ text: 'Continue Shopping', onPress: () => router.push('/search') }]
       );
     } catch (error: any) {
+      console.error('Checkout error:', error);
       Alert.alert('Payment Failed', error.message || 'Something went wrong.');
     } finally {
       setIsProcessing(false);
     }
   };
+  
+  
 
   return (
     <SafeAreaView className="bg-white flex-1">
