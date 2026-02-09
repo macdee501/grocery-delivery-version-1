@@ -14,11 +14,12 @@
     },
     "android": {
       "package": "com.pain.freshcart",
+       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/avacodologo.png",
         "backgroundColor": "#E6F4FE"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false
     },
     "web": {
