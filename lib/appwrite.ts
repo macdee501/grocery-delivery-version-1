@@ -166,7 +166,6 @@ export const getCategories = async () => {
     }
 };
 
-// Get user orders
 export const getUserOrders = async (userId:string)=>{
 
 try{
@@ -231,12 +230,22 @@ export const getHomeOffers = async () => {
   };
   
 
-  export const getFileView = (fileId: string) => {
-    return storage.getFileView(
-      appwriteConfig.bucketId,
-      fileId
-    ).href;
+  export const getFileView = (fileId?: string) => {
+    try {
+      if (!fileId) return undefined;
+  
+      const url = storage.getFileView(
+        appwriteConfig.bucketId,
+        fileId
+      );
+  
+      return url?.href;
+    } catch (error) {
+      console.warn("⚠️ getFileView failed for fileId:", fileId);
+      return undefined;
+    }
   };
+  
   
   
   
